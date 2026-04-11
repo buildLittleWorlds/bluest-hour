@@ -388,17 +388,30 @@
     const LAT = 38.9556;
     const LNG = -90.1868;
     const WALK_MINUTES = 20;
-    const API_URL = `https://api.sunrise-sunset.org/json?lat=${LAT}&lng=${LNG}&formatted=0`;
+    const TIMEZONE = 'America/Chicago';
+    const API_URL = `https://api.sunrisesunset.io/json?lat=${LAT}&lng=${LNG}&timezone=${TIMEZONE}`;
 
-    function parseUTC(dateStr) {
-      return new Date(dateStr);
+    // Local horizon offset (minutes). The bluest moment arrives earlier than
+    // the astronomical midpoint because terrain, trees, and buildings block
+    // the sun before it reaches the geometric horizon. Calibrated by nightly
+    // observation in Godfrey, IL and recorded in the tracking spreadsheet.
+    // Positive value = shift the predicted bluest moment earlier.
+    const LOCAL_OFFSET_MINUTES = 35;
+
+    function parseLocalTime(timeStr, dateStr) {
+      // Parse "7:36:00 PM" with a date string into a Date object
+      const [time, period] = timeStr.trim().split(/(AM|PM)/i);
+      const [h, m, s] = time.trim().split(':').map(Number);
+      let hour = h;
+      if (period.toUpperCase() === 'PM' && h !== 12) hour += 12;
+      if (period.toUpperCase() === 'AM' && h === 12) hour = 0;
+      return new Date(`${dateStr}T${String(hour).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s || 0).padStart(2,'0')}`);
     }
 
     function formatTime(date) {
       return date.toLocaleTimeString('en-US', {
         hour: 'numeric',
         minute: '2-digit',
-        timeZone: 'America/Chicago'
       });
     }
 
@@ -418,29 +431,24 @@
         }
 
         const r = data.results;
-        const civilEnd = parseUTC(r.civil_twilight_end);
-        const nauticalEnd = parseUTC(r.nautical_twilight_end);
+        const dateStr = r.date; // "2026-04-10"
+        const sunset = parseLocalTime(r.sunset, dateStr);
+        const dusk = parseLocalTime(r.dusk, dateStr);
+        const nauticalEnd = parseLocalTime(r.nautical_twilight_end, dateStr);
 
-        // Perceptual blue hour: starts ~15 min before civil twilight ends.
-        // The eye notices the deep blue creeping in during late civil twilight
-        // as warm tones fade — field-tested in Godfrey, IL (April 2026).
-        const blueStart = new Date(civilEnd.getTime() - 15 * 60000);
-        const blueEnd = nauticalEnd;
-        const blueHourMinutes = minutesBetween(blueStart, blueEnd);
+        // Astronomical blue hour midpoint (between dusk and nautical end)
+        const astroMidpoint = new Date((dusk.getTime() + nauticalEnd.getTime()) / 2);
 
-        // Center the walk on the midpoint of the perceptual blue hour
-        const midpoint = new Date((blueStart.getTime() + blueEnd.getTime()) / 2);
-        const walkStart = new Date(midpoint.getTime() - (WALK_MINUTES / 2) * 60000);
-        const walkEnd = new Date(midpoint.getTime() + (WALK_MINUTES / 2) * 60000);
+        // Apply local horizon offset to get predicted bluest moment
+        const bluestMoment = new Date(astroMidpoint.getTime() - LOCAL_OFFSET_MINUTES * 60000);
 
-        // Calculate overlap between walk and perceptual blue hour
-        const overlapStart = Math.max(walkStart.getTime(), blueStart.getTime());
-        const overlapEnd = Math.min(walkEnd.getTime(), blueEnd.getTime());
-        const overlapMinutes = Math.max(0, Math.round((overlapEnd - overlapStart) / 60000));
+        // Center the walk on the predicted bluest moment
+        const walkStart = new Date(bluestMoment.getTime() - (WALK_MINUTES / 2) * 60000);
+        const walkEnd = new Date(bluestMoment.getTime() + (WALK_MINUTES / 2) * 60000);
 
-        // Timeline positioning (as percentage of blue hour window, with padding)
-        const windowStart = new Date(blueStart.getTime() - 10 * 60000);
-        const windowEnd = new Date(blueEnd.getTime() + 10 * 60000);
+        // Timeline: show from sunset to nautical end with padding
+        const windowStart = new Date(sunset.getTime() - 5 * 60000);
+        const windowEnd = new Date(nauticalEnd.getTime() + 5 * 60000);
         const windowDuration = windowEnd - windowStart;
 
         const walkLeftPct = ((walkStart - windowStart) / windowDuration) * 100;
@@ -450,33 +458,33 @@
           <div class="walk-time">
             <div class="label">Start your walk at</div>
             <div class="time">${formatTime(walkStart)}</div>
-            <div class="subtitle">to catch the deepest blue</div>
+            <div class="subtitle">bluest moment predicted at ${formatTime(bluestMoment)}</div>
           </div>
 
           <div class="timeline">
-            <div class="timeline-walk" style="left: ${walkLeftPct}%; width: ${walkWidthPct}%"></div>
+            <div class="timeline-walk" style="left: ${Math.max(0,walkLeftPct)}%; width: ${walkWidthPct}%"></div>
           </div>
           <div class="timeline-labels">
-            <span>${formatTime(blueStart)} blue begins</span>
-            <span>${formatTime(blueEnd)} nautical end</span>
+            <span>${formatTime(sunset)} sunset</span>
+            <span>${formatTime(nauticalEnd)} nautical end</span>
           </div>
 
           <div class="stats">
             <div class="stat">
-              <div class="value">${blueHourMinutes} min</div>
-              <div class="desc">Blue hour</div>
+              <div class="value">${formatTime(bluestMoment)}</div>
+              <div class="desc">Bluest moment</div>
             </div>
             <div class="stat">
-              <div class="value">${overlapMinutes} min</div>
-              <div class="desc">Walk in blue</div>
+              <div class="value">${LOCAL_OFFSET_MINUTES} min</div>
+              <div class="desc">Local offset</div>
             </div>
             <div class="stat">
-              <div class="value">${formatTime(blueStart)}</div>
-              <div class="desc">Blue begins</div>
+              <div class="value">${formatTime(dusk)}</div>
+              <div class="desc">Dusk (API)</div>
             </div>
             <div class="stat">
-              <div class="value">${formatTime(blueEnd)}</div>
-              <div class="desc">Blue fades</div>
+              <div class="value">${formatTime(nauticalEnd)}</div>
+              <div class="desc">Nautical end</div>
             </div>
           </div>
         `;
