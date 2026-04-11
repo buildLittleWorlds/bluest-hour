@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Bluest Hour</title>
+  <style>
+    :root {
+      --deep-blue: #0a1628;
+      --twilight-blue: #1a3a5c;
+      --sky-blue: #2e6b9e;
+      --light-blue: #5b9bd5;
+      --pale-gold: #f0d68a;
+      --warm-white: #f5f0e8;
+      --card-bg: rgba(26, 58, 92, 0.35);
+      --glass-border: rgba(91, 155, 213, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: linear-gradient(180deg,
+        #0a1628 0%,
+        #12284a 20%,
+        #1a3a5c 40%,
+        #2e6b9e 65%,
+        #5b9bd5 85%,
+        #d4a847 95%,
+        #c45e20 100%
+      );
+      min-height: 100vh;
+      color: var(--warm-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      max-width: 600px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .epigraph {
+      font-style: italic;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      opacity: 0.85;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .epigraph .attribution {
+      display: block;
+      margin-top: 0.4rem;
+      font-style: normal;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 520px;
+      width: 100%;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+      opacity: 0.7;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .walk-time {
+      text-align: center;
+      padding: 1.5rem 0;
+    }
+
+    .walk-time .label {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .walk-time .time {
+      font-size: 3.2rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--pale-gold);
+      text-shadow: 0 0 20px rgba(240, 214, 138, 0.3);
+    }
+
+    .walk-time .subtitle {
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+      opacity: 0.8;
+      font-style: italic;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      height: 60px;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: linear-gradient(90deg,
+        #5b9bd5 0%,
+        #2e6b9e 30%,
+        #1a3a5c 60%,
+        #0a1628 100%
+      );
+    }
+
+    .timeline-walk {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: rgba(240, 214, 138, 0.25);
+      border-left: 2px solid var(--pale-gold);
+      border-right: 2px solid var(--pale-gold);
+    }
+
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 0.4rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+
+    .stat .value {
+      font-size: 1.4rem;
+      color: var(--light-blue);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat .desc {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Journal Section */
+    .journal-section {
+      margin-top: 0.5rem;
+    }
+
+    .journal-input {
+      width: 100%;
+      min-height: 80px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      color: var(--warm-white);
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .journal-input::placeholder {
+      color: rgba(245, 240, 232, 0.4);
+      font-style: italic;
+    }
+
+    .journal-input:focus {
+      border-color: var(--light-blue);
+    }
+
+    .journal-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+    }
+
+    .analyze-btn {
+      background: rgba(91, 155, 213, 0.3);
+      border: 1px solid var(--glass-border);
+      color: var(--warm-white);
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .analyze-btn:hover {
+      background: rgba(91, 155, 213, 0.5);
+    }
+
+    .analyze-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .model-status {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .sentiment-result {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .sentiment-result.visible {
+      display: block;
+    }
+
+    .sentiment-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin-bottom: 0.4rem;
+    }
+
+    .sentiment-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+
+    .sentiment-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    .sentiment-fill.positive {
+      background: linear-gradient(90deg, var(--light-blue), var(--pale-gold));
+    }
+
+    .sentiment-fill.negative {
+      background: linear-gradient(90deg, #c45e20, #8b3a1a);
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .loading .dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0% { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75% { content: '...'; }
+    }
+
+    .error {
+      color: #e8a87c;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      opacity: 0.5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    footer a {
+      color: var(--light-blue);
+      text-decoration: none;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.8rem; }
+      .walk-time .time { font-size: 2.4rem; }
+      .card { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>The Bluest Hour</h1>
+    <p class="epigraph">
+      "In certain latitudes there comes a span of time approaching and following
+      the summer solstice, some weeks in all, when the twilights turn long and blue."
+      <span class="attribution">— Joan Didion, <em>Blue Nights</em></span>
+    </p>
+  </header>
+
+  <div class="card" id="walk-card">
+    <h2>Tonight's Walk</h2>
+    <div id="walk-content" class="loading">
+      <p>Fetching twilight data<span class="dots"></span></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Walk Journal</h2>
+    <div class="journal-section">
+      <textarea
+        class="journal-input"
+        id="journal-input"
+        placeholder="How was the light tonight? What did you notice?"
+      ></textarea>
+      <div class="journal-controls">
+        <span class="model-status" id="model-status">Sentiment model not loaded</span>
+        <button class="analyze-btn" id="analyze-btn" disabled>Analyze Mood</button>
+      </div>
+      <div class="sentiment-result" id="sentiment-result">
+        <div class="sentiment-label" id="sentiment-label"></div>
+        <div id="sentiment-text"></div>
+        <div class="sentiment-bar">
+          <div class="sentiment-fill" id="sentiment-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Godfrey, IL · 38.9556°N, 90.1868°W<br>
+    Twilight data from <a href="https://sunrise-sunset.org/api">Sunrise-Sunset API</a>
+    · ML via <a href="https://huggingface.co/docs/transformers.js">Transformers.js v4</a>
+  </footer>
+
+  <script type="module">
+    // ── Twilight calculation ──────────────────────────────────────────────
+
+    const LAT = 38.9556;
+    const LNG = -90.1868;
+    const WALK_MINUTES = 20;
+    const API_URL = `https://api.sunrise-sunset.org/json?lat=${LAT}&lng=${LNG}&formatted=0`;
+
+    function parseUTC(dateStr) {
+      return new Date(dateStr);
+    }
+
+    function formatTime(date) {
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZone: 'America/Chicago'
+      });
+    }
+
+    function minutesBetween(a, b) {
+      return Math.round((b - a) / 60000);
+    }
+
+    async function fetchTwilightData() {
+      const walkContent = document.getElementById('walk-content');
+
+      try {
+        const resp = await fetch(API_URL);
+        const data = await resp.json();
+
+        if (data.status !== 'OK') {
+          throw new Error('API returned error status');
+        }
+
+        const r = data.results;
+        const civilEnd = parseUTC(r.civil_twilight_end);
+        const nauticalEnd = parseUTC(r.nautical_twilight_end);
+        const blueHourMinutes = minutesBetween(civilEnd, nauticalEnd);
+
+        // Center the walk on the midpoint of the blue hour
+        const midpoint = new Date((civilEnd.getTime() + nauticalEnd.getTime()) / 2);
+        const walkStart = new Date(midpoint.getTime() - (WALK_MINUTES / 2) * 60000);
+        const walkEnd = new Date(midpoint.getTime() + (WALK_MINUTES / 2) * 60000);
+
+        // Calculate overlap between walk and blue hour
+        const overlapStart = Math.max(walkStart.getTime(), civilEnd.getTime());
+        const overlapEnd = Math.min(walkEnd.getTime(), nauticalEnd.getTime());
+        const overlapMinutes = Math.max(0, Math.round((overlapEnd - overlapStart) / 60000));
+
+        // Timeline positioning (as percentage of blue hour window, with padding)
+        const windowStart = new Date(civilEnd.getTime() - 10 * 60000);
+        const windowEnd = new Date(nauticalEnd.getTime() + 10 * 60000);
+        const windowDuration = windowEnd - windowStart;
+
+        const walkLeftPct = ((walkStart - windowStart) / windowDuration) * 100;
+        const walkWidthPct = ((walkEnd - walkStart) / windowDuration) * 100;
+
+        walkContent.innerHTML = `
+          <div class="walk-time">
+            <div class="label">Start your walk at</div>
+            <div class="time">${formatTime(walkStart)}</div>
+            <div class="subtitle">to catch the deepest blue</div>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-walk" style="left: ${walkLeftPct}%; width: ${walkWidthPct}%"></div>
+          </div>
+          <div class="timeline-labels">
+            <span>${formatTime(civilEnd)} civil</span>
+            <span>${formatTime(nauticalEnd)} nautical</span>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="value">${blueHourMinutes} min</div>
+              <div class="desc">Blue hour</div>
+            </div>
+            <div class="stat">
+              <div class="value">${overlapMinutes} min</div>
+              <div class="desc">Walk in blue</div>
+            </div>
+            <div class="stat">
+              <div class="value">${formatTime(civilEnd)}</div>
+              <div class="desc">Civil end</div>
+            </div>
+            <div class="stat">
+              <div class="value">${formatTime(nauticalEnd)}</div>
+              <div class="desc">Nautical end</div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        walkContent.innerHTML = `
+          <div class="error">
+            <p>Could not fetch twilight data.</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.7">${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // ── Transformers.js v4 — Sentiment Analysis ──────────────────────────
+
+    let classifier = null;
+
+    async function loadModel() {
+      const statusEl = document.getElementById('model-status');
+      const btn = document.getElementById('analyze-btn');
+
+      try {
+        statusEl.textContent = 'Loading sentiment model…';
+
+        const { pipeline } = await import(
+          'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.0.1'
+        );
+
+        classifier = await pipeline(
+          'sentiment-analysis',
+          'Xenova/distilbert-base-uncased-finetuned-sst-2-english',
+          { device: 'wasm' }
+        );
+
+        statusEl.textContent = 'Model ready';
+        btn.disabled = false;
+      } catch (err) {
+        statusEl.textContent = `Model error: ${err.message}`;
+        console.error('Transformers.js load error:', err);
+      }
+    }
+
+    async function analyzeSentiment() {
+      const input = document.getElementById('journal-input').value.trim();
+      if (!input || !classifier) return;
+
+      const btn = document.getElementById('analyze-btn');
+      const resultEl = document.getElementById('sentiment-result');
+      const labelEl = document.getElementById('sentiment-label');
+      const textEl = document.getElementById('sentiment-text');
+      const fillEl = document.getElementById('sentiment-fill');
+
+      btn.disabled = true;
+      btn.textContent = 'Analyzing…';
+
+      try {
+        const result = await classifier(input);
+        const { label, score } = result[0];
+        const pct = Math.round(score * 100);
+        const isPositive = label === 'POSITIVE';
+
+        labelEl.textContent = `Mood: ${label.toLowerCase()}`;
+        textEl.textContent = `${pct}% confidence — ${
+          isPositive
+            ? 'a good evening for the blue light'
+            : 'even the difficult evenings have their own color'
+        }`;
+
+        fillEl.className = `sentiment-fill ${isPositive ? 'positive' : 'negative'}`;
+        fillEl.style.width = `${pct}%`;
+
+        resultEl.classList.add('visible');
+      } catch (err) {
+        textEl.textContent = `Analysis failed: ${err.message}`;
+        resultEl.classList.add('visible');
+      }
+
+      btn.textContent = 'Analyze Mood';
+      btn.disabled = false;
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────
+
+    document.getElementById('analyze-btn').addEventListener('click', analyzeSentiment);
+
+    fetchTwilightData();
+    loadModel();
+  </script>
+</body>
+</html>
