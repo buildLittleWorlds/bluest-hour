@@ -420,21 +420,27 @@
         const r = data.results;
         const civilEnd = parseUTC(r.civil_twilight_end);
         const nauticalEnd = parseUTC(r.nautical_twilight_end);
-        const blueHourMinutes = minutesBetween(civilEnd, nauticalEnd);
 
-        // Center the walk on the midpoint of the blue hour
-        const midpoint = new Date((civilEnd.getTime() + nauticalEnd.getTime()) / 2);
+        // Perceptual blue hour: starts ~15 min before civil twilight ends.
+        // The eye notices the deep blue creeping in during late civil twilight
+        // as warm tones fade — field-tested in Godfrey, IL (April 2026).
+        const blueStart = new Date(civilEnd.getTime() - 15 * 60000);
+        const blueEnd = nauticalEnd;
+        const blueHourMinutes = minutesBetween(blueStart, blueEnd);
+
+        // Center the walk on the midpoint of the perceptual blue hour
+        const midpoint = new Date((blueStart.getTime() + blueEnd.getTime()) / 2);
         const walkStart = new Date(midpoint.getTime() - (WALK_MINUTES / 2) * 60000);
         const walkEnd = new Date(midpoint.getTime() + (WALK_MINUTES / 2) * 60000);
 
-        // Calculate overlap between walk and blue hour
-        const overlapStart = Math.max(walkStart.getTime(), civilEnd.getTime());
-        const overlapEnd = Math.min(walkEnd.getTime(), nauticalEnd.getTime());
+        // Calculate overlap between walk and perceptual blue hour
+        const overlapStart = Math.max(walkStart.getTime(), blueStart.getTime());
+        const overlapEnd = Math.min(walkEnd.getTime(), blueEnd.getTime());
         const overlapMinutes = Math.max(0, Math.round((overlapEnd - overlapStart) / 60000));
 
         // Timeline positioning (as percentage of blue hour window, with padding)
-        const windowStart = new Date(civilEnd.getTime() - 10 * 60000);
-        const windowEnd = new Date(nauticalEnd.getTime() + 10 * 60000);
+        const windowStart = new Date(blueStart.getTime() - 10 * 60000);
+        const windowEnd = new Date(blueEnd.getTime() + 10 * 60000);
         const windowDuration = windowEnd - windowStart;
 
         const walkLeftPct = ((walkStart - windowStart) / windowDuration) * 100;
@@ -451,8 +457,8 @@
             <div class="timeline-walk" style="left: ${walkLeftPct}%; width: ${walkWidthPct}%"></div>
           </div>
           <div class="timeline-labels">
-            <span>${formatTime(civilEnd)} civil</span>
-            <span>${formatTime(nauticalEnd)} nautical</span>
+            <span>${formatTime(blueStart)} blue begins</span>
+            <span>${formatTime(blueEnd)} nautical end</span>
           </div>
 
           <div class="stats">
@@ -465,12 +471,12 @@
               <div class="desc">Walk in blue</div>
             </div>
             <div class="stat">
-              <div class="value">${formatTime(civilEnd)}</div>
-              <div class="desc">Civil end</div>
+              <div class="value">${formatTime(blueStart)}</div>
+              <div class="desc">Blue begins</div>
             </div>
             <div class="stat">
-              <div class="value">${formatTime(nauticalEnd)}</div>
-              <div class="desc">Nautical end</div>
+              <div class="value">${formatTime(blueEnd)}</div>
+              <div class="desc">Blue fades</div>
             </div>
           </div>
         `;
