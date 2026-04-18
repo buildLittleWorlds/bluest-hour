@@ -55,6 +55,7 @@ The later project, [`../bluest-hour-almanac/`](../bluest-hour-almanac/), keeps t
 - [`SPECIFICATION.md`](./SPECIFICATION.md) — detailed technical notes for the static build
 - [`research-journal.md`](./research-journal.md) — the week-by-week exemplar journal
 - [`PAPER.md`](./PAPER.md) — the paper-lite exemplar
+- [`SOURCE-SHEET.md`](./SOURCE-SHEET.md) — consolidated Consensus searches, candidate papers, and source directions for the Bluest Hour research question
 
 ## Credits
 
