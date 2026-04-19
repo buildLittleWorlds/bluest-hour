@@ -247,9 +247,6 @@ Use this journal as the spine for a short paper in plain language, then treat th
 
 
 
-Here’s a clean markdown journal entry that captures the problem clearly and analytically:
-
-```markdown
 # Journal Entry: Persistence Problem in Bluest Hour Space
 
 ## Date
@@ -308,7 +305,6 @@ There is an interesting conceptual gap here: the Space is already framed as some
 In a sense, the epistemology of the project (iterative, observational, local) is not yet matched by its technical infrastructure (stateless, session-bound, non-retentive).
 
 That mismatch is now the central design problem.
-```
 
 
 
